@@ -19,7 +19,8 @@ public class TextureGeneratorWindow : EditorWindow
 	[MenuItem ("Window/Texture TK/Generator")]
 	public static void ShowWindow ()
 	{
-		EditorWindow.GetWindow<TextureGeneratorWindow> ("Tex-Generator");
+		EditorWindow win = EditorWindow.GetWindow<TextureGeneratorWindow> ("Tex-Generator");
+		win.minSize = new Vector2 (160f, 200f);
 	}
 
 	void OnEnable()
@@ -36,23 +37,25 @@ public class TextureGeneratorWindow : EditorWindow
 	
 	void OnGUI ()
 	{
-		GUILayout.BeginHorizontal ();
-		if (GUILayout.Button ("Generate")){
+		//Toolbar
+		GUILayout.BeginHorizontal (EditorStyles.toolbar);
+		EditorGUI.BeginChangeCheck ();
+		selectedMethod = EditorGUILayout.Popup(selectedMethod, methodNames, EditorStyles.toolbarDropDown, GUILayout.Width (50f));
+		if (EditorGUI.EndChangeCheck ()) {
+			parameterData = loadParameters(myArrayMethodInfo[selectedMethod]);
+		}
+		if (GUILayout.Button ("Generate", EditorStyles.toolbarButton, GUILayout.Width (50f))){
 			preview = TextureTools.GrayscaleToColor(myArrayMethodInfo[selectedMethod].Invoke(null, parameterData) as Texture2D, startColor, endColor);
 		}
-		if (GUILayout.Button ("Save")){
+		if (GUILayout.Button ("Save", EditorStyles.toolbarButton, GUILayout.Width (50f))){
 			SaveTexture(preview, EditorUtility.SaveFilePanelInProject("Save Texture", methodNames[selectedMethod], "png", ""));
 			AssetDatabase.Refresh();
 		}
+		GUILayout.FlexibleSpace ();
 		GUILayout.EndHorizontal ();
+		//Body
 		showSettings = GUILayout.Toggle (showSettings, "Settings", EditorStyles.foldout);
 		if (showSettings){
-			GUILayout.Box ("Deformation", GUILayout.ExpandWidth(true));
-			EditorGUI.BeginChangeCheck ();
-			selectedMethod = EditorGUILayout.Popup(selectedMethod, methodNames);
-			if (EditorGUI.EndChangeCheck ()) {
-				parameterData = loadParameters(myArrayMethodInfo[selectedMethod]);
-			}
 			ParameterInfo[] parameters = myArrayMethodInfo[selectedMethod].GetParameters();
 			for (int i=0;i<parameters.Length;i++){
 				GUILayout.BeginHorizontal();
@@ -65,9 +68,14 @@ public class TextureGeneratorWindow : EditorWindow
 				}
 				GUILayout.EndHorizontal();
 			}
-			GUILayout.Box ("Color Scheme", GUILayout.ExpandWidth(true));
+			GUILayout.BeginHorizontal();
+			GUILayout.Label ("Start Color", GUILayout.Width (80f));
 			startColor = EditorGUILayout.ColorField (startColor);
+			GUILayout.EndHorizontal();
+			GUILayout.BeginHorizontal();
+			GUILayout.Label ("End Color", GUILayout.Width (80f));
 			endColor = EditorGUILayout.ColorField (endColor);
+			GUILayout.EndHorizontal();
 		}
 		showPreview = GUILayout.Toggle (showPreview, "Preview", EditorStyles.foldout);
 		if (showPreview) {

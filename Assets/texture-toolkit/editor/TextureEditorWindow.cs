@@ -25,8 +25,6 @@ public class TextureEditorWindow : EditorWindow
 		GUILayout.BeginHorizontal (EditorStyles.toolbar);
 			if (GUILayout.Button ("Open", EditorStyles.toolbarButton)){
 				preview = LoadTexture (EditorUtility.OpenFilePanel("Open Image", Application.absoluteURL, ""));
-				//ClearVersions();
-				//AddVersion ();
 				versions.Clear ();
 				versions.Add (Instantiate(preview) as Texture2D);
 			}
@@ -34,7 +32,7 @@ public class TextureEditorWindow : EditorWindow
 				SaveTexture(preview, EditorUtility.SaveFilePanelInProject("Save Texture", "image", "png", ""));
 				AssetDatabase.Refresh();
 			}
-			currentTool = EditorGUILayout.Popup (currentTool, new string[3]{"None", "Brush", "Line"}, EditorStyles.toolbarDropDown);
+			currentTool = EditorGUILayout.Popup (currentTool, new string[3]{"No Tool", "Brush", "Line"}, EditorStyles.toolbarDropDown);
 			if (GUILayout.Button ("Rotate", EditorStyles.toolbarButton)) {
 				preview = texturetk.TextureTools.Rotate(preview);
 			}
