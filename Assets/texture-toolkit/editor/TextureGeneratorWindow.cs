@@ -36,11 +36,12 @@ public class TextureGeneratorWindow : EditorWindow
 	
 	void OnGUI ()
 	{
-		GUILayout.BeginHorizontal ();
-		if (GUILayout.Button ("Generate")){
-			preview = TextureTools.GrayscaleToColor(myArrayMethodInfo[selectedMethod].Invoke(null, parameterData) as Texture2D, startColor, endColor);
+		GUILayout.BeginHorizontal (EditorStyles.toolbar);
+		if (GUILayout.Button ("Generate", EditorStyles.toolbarButton)){
+			preview = myArrayMethodInfo[selectedMethod].Invoke(null, parameterData) as Texture2D;
+			TextureTools.GrayscaleToColor(preview, startColor, endColor);
 		}
-		if (GUILayout.Button ("Save")){
+		if (GUILayout.Button ("Save", EditorStyles.toolbarButton)){
 			SaveTexture(preview, EditorUtility.SaveFilePanelInProject("Save Texture", methodNames[selectedMethod], "png", ""));
 			AssetDatabase.Refresh();
 		}

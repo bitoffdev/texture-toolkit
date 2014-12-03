@@ -7,11 +7,9 @@ using System.Collections.Generic;
 public class TextureEditorWindow : EditorWindow
 {
 	Texture2D preview;
-	int currentToolbar = 0;
 	int currentTool = 0;
-	bool drawToolOn = false;
-	List<Texture2D> pastVersions = new List<Texture2D>();
-	VersionManager<Texture2D> versions = new VersionManager<Texture2D> ();
+	List<Texture2D> versions = new List<Texture2D> ();
+	Vector2 clickpos;
 	
 	[MenuItem ("Window/Texture TK/Editor")]
 	public static void ShowWindow ()
@@ -25,32 +23,35 @@ public class TextureEditorWindow : EditorWindow
 		GUILayout.BeginHorizontal (EditorStyles.toolbar);
 			if (GUILayout.Button ("Open", EditorStyles.toolbarButton)){
 				preview = LoadTexture (EditorUtility.OpenFilePanel("Open Image", Application.absoluteURL, ""));
-				//ClearVersions();
-				//AddVersion ();
 				versions.Clear ();
-				versions.Add (Instantiate(preview) as Texture2D);
+				versions.Add(Instantiate(preview) as Texture2D);
 			}
 			if (GUILayout.Button ("Save", EditorStyles.toolbarButton)){
 				SaveTexture(preview, EditorUtility.SaveFilePanelInProject("Save Texture", "image", "png", ""));
 				AssetDatabase.Refresh();
 			}
-			currentTool = EditorGUILayout.Popup (currentTool, new string[3]{"None", "Brush", "Line"}, EditorStyles.toolbarDropDown);
+			currentTool = EditorGUILayout.Popup (currentTool, new string[3]{"No Tool", "Brush", "Line"}, EditorStyles.toolbarDropDown, GUILayout.Width (60f));
 			if (GUILayout.Button ("Rotate", EditorStyles.toolbarButton)) {
-				preview = texturetk.TextureTools.Rotate(preview);
+				texturetk.TextureTools.Rotate(preview);
+				versions.Add(Instantiate(preview) as Texture2D);
 			}
 			if (GUILayout.Button ("Flip Y", EditorStyles.toolbarButton)) {
-				preview = texturetk.TextureTools.FlipY(preview);
+				texturetk.TextureTools.FlipY(preview);
+				versions.Add(Instantiate(preview) as Texture2D);
 			}
 			if (GUILayout.Button ("Undo", EditorStyles.toolbarButton)) {
-				versions.Revert();
-				preview = Instantiate(versions.currentVersion) as Texture2D;
-				Repaint();
+				if(versions.Count>1){
+					versions.RemoveAt(versions.Count-1);
+					preview = Instantiate(versions[versions.Count-1]) as Texture2D;
+					Repaint();
+				}
 			}
 		GUILayout.EndHorizontal ();
 		GUILayout.Label (preview);
-		Rect texrect = GUILayoutUtility.GetLastRect ();
 		if (currentTool==1) {
 			TryDraw (GUILayoutUtility.GetLastRect ());
+		} else if (currentTool==2) {
+			TryLine (GUILayoutUtility.GetLastRect ());
 		}
 	}
 	#region Static Helper Methods
@@ -97,31 +98,18 @@ public class TextureEditorWindow : EditorWindow
 			versions.Add(Instantiate(preview) as Texture2D);
 		}
 	}
-}
-
-public class VersionManager<T>
-{
-	List<T> versions;
-	public VersionManager(){
-		versions = new List<T>();
-	}
-	public void Add(T version){
-		versions.Add (version);
-	}
-	public void Clear(){
-		versions = new List<T> ();
-	}
-	public void Revert(){
-		if (versions.Count>1){
-			versions.RemoveAt(versions.Count-1);
-		}
-	}
-	public T currentVersion{
-		get{
-			return versions[versions.Count-1];
-		}
-		set{
-			versions[-1] = value;
+	void TryLine(Rect texrect){
+		if (Event.current.isMouse && texrect.Contains (Event.current.mousePosition)){
+			float pixRatio = Mathf.Max(1f, preview.width / texrect.width); // Ratio to convert mouse coordinates to texture pixel coordinates
+			int texCursorX = (int)((Event.current.mousePosition.x - texrect.x - 3) * pixRatio);
+			int texCursorY = preview.height - (int)((Event.current.mousePosition.y - texrect.y - 3) * pixRatio);
+			if (Event.current.type == EventType.MouseDown) {
+				clickpos = new Vector2(texCursorX, texCursorY);
+			} else if (Event.current.type==EventType.MouseUp){
+				texturetk.TextureTools.DrawLine(preview, clickpos, new Vector2(texCursorX, texCursorY), Color.red);
+				versions.Add(Instantiate(preview) as Texture2D);
+				Repaint ();
+			}
 		}
 	}
 }
