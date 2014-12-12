@@ -1,23 +1,34 @@
 =================================
-PUBLISHER
+TEXTURE TOOLKIT BETA v0.1
 =================================
-Procedural Texture Toolkit v1.0
 By EJM Software
 ejmsoftware.cloudvent.net
 
 
+=================================
+TEXTURE GENERATOR
+=================================
+Window > Texture TK > Generator
+Quickly generate procedural
+textures.
+
 
 =================================
-ABOUT
+TEXTURE EDITOR
 =================================
-Quickly generate textures using
-this toolkit. Use the editor
-window to create textures in
-the Unity editor, or use the
-well-commented ProceduralTexture
-class to create textures
-dynamically
+Window > Texture TK > Editor
+Quickly edit your textures.
 
+
+=================================
+API
+=================================
+Use the documented classes
+TextureGen and TextureTools,
+found in the texturetk namespace
+to make editing textures easier.
+Full documentation can be found
+at ejmsoftware.cloudvent.net
 
 
 =================================
