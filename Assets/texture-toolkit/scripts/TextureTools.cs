@@ -25,6 +25,12 @@ namespace texturetk
 			}
 			tex.Apply ();
 		}
+		public static void DrawLine (Texture2D tex, Vector2 pos1, Vector2 pos2, Color col){
+			for (int x=Mathf.Min (pos1.x, pos2.x);x<=Mathf.Max (pos1.x, pos2.x);x++){
+				
+			}
+			return;
+		}
 		/// <summary>
 		/// Flips the given texture vertically
 		/// </summary>

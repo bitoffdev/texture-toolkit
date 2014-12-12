@@ -44,7 +44,6 @@ public class TextureGeneratorWindow : EditorWindow
 		if (EditorGUI.EndChangeCheck ()) {
 			parameterData = loadParameters(myArrayMethodInfo[selectedMethod]);
 		}
-		GUILayout.BeginHorizontal (EditorStyles.toolbar);
 		if (GUILayout.Button ("Generate", EditorStyles.toolbarButton, GUILayout.Width (50f))){
 			preview = myArrayMethodInfo[selectedMethod].Invoke(null, parameterData) as Texture2D;
 			TextureTools.GrayscaleToColor(preview, startColor, endColor);

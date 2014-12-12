@@ -30,7 +30,7 @@ public class TextureEditorWindow : EditorWindow
 				SaveTexture(preview, EditorUtility.SaveFilePanelInProject("Save Texture", "image", "png", ""));
 				AssetDatabase.Refresh();
 			}
-			currentTool = EditorGUILayout.Popup (currentTool, new string[3]{"No Tool", "Brush", "Line"}, EditorStyles.toolbarDropDown, GUILayout.Width (60f));
+			currentTool = EditorGUILayout.Popup (currentTool, new string[4]{"No Tool", "Brush", "Line", "Rect"}, EditorStyles.toolbarDropDown, GUILayout.Width (60f));
 			if (GUILayout.Button ("Rotate", EditorStyles.toolbarButton)) {
 				texturetk.TextureTools.Rotate(preview);
 				versions.Add(Instantiate(preview) as Texture2D);
@@ -52,6 +52,8 @@ public class TextureEditorWindow : EditorWindow
 			TryDraw (GUILayoutUtility.GetLastRect ());
 		} else if (currentTool==2) {
 			TryLine (GUILayoutUtility.GetLastRect ());
+		} else if (currentTool==3) {
+			TryRect (GUILayoutUtility.GetLastRect ());
 		}
 	}
 	#region Static Helper Methods
@@ -107,6 +109,20 @@ public class TextureEditorWindow : EditorWindow
 				clickpos = new Vector2(texCursorX, texCursorY);
 			} else if (Event.current.type==EventType.MouseUp){
 				texturetk.TextureTools.DrawLine(preview, clickpos, new Vector2(texCursorX, texCursorY), Color.red);
+				versions.Add(Instantiate(preview) as Texture2D);
+				Repaint ();
+			}
+		}
+	}
+	void TryRect(Rect texrect){
+		if (Event.current.isMouse && texrect.Contains (Event.current.mousePosition)){
+			float pixRatio = Mathf.Max(1f, preview.width / texrect.width); // Ratio to convert mouse coordinates to texture pixel coordinates
+			int texCursorX = (int)((Event.current.mousePosition.x - texrect.x - 3) * pixRatio);
+			int texCursorY = preview.height - (int)((Event.current.mousePosition.y - texrect.y - 3) * pixRatio);
+			if (Event.current.type == EventType.MouseDown) {
+				clickpos = new Vector2(texCursorX, texCursorY);
+			} else if (Event.current.type==EventType.MouseUp){
+				//texturetk.TextureTools.DrawLine(preview, clickpos, new Vector2(texCursorX, texCursorY), Color.red);
 				versions.Add(Instantiate(preview) as Texture2D);
 				Repaint ();
 			}
