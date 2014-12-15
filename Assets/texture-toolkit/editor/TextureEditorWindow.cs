@@ -7,6 +7,7 @@ using System.Collections.Generic;
 public class TextureEditorWindow : EditorWindow
 {
 	Texture2D preview;
+	Rect labelposition;
 	int currentTool = 0;
 	List<Texture2D> versions = new List<Texture2D> ();
 	Vector2 clickpos;
@@ -47,7 +48,15 @@ public class TextureEditorWindow : EditorWindow
 				}
 			}
 		GUILayout.EndHorizontal ();
+		
 		GUILayout.Label (preview);
+		labelposition = GUILayoutUtility.GetLastRect();
+		/*
+		GUIStyle style = new GUIStyle();
+		labelposition = GUILayoutUtility.GetRect(this.position.width, this.position.width);
+		GUI.DrawTexture(labelposition, preview, ScaleMode.StretchToFill, true, 10.0f);
+		*/
+		
 		if (currentTool==1) {
 			TryDraw (GUILayoutUtility.GetLastRect ());
 		} else if (currentTool==2) {
@@ -55,6 +64,8 @@ public class TextureEditorWindow : EditorWindow
 		} else if (currentTool==3) {
 			TryRect (GUILayoutUtility.GetLastRect ());
 		}
+		GUI.Box (new Rect (this.position.width-100f, this.position.height-20f, 100f, 20f), TexMousePos().ToString ());
+		Repaint ();
 	}
 	#region Static Helper Methods
 	/// <summary>
@@ -84,6 +95,13 @@ public class TextureEditorWindow : EditorWindow
 		return tex;
 	}
 	#endregion
+	Vector2 TexMousePos(){
+		float pixRatio = Mathf.Max(1f, preview.width / labelposition.width); // Ratio to convert mouse coordinates to texture pixel coordinates
+		int texCursorX = (int)((Event.current.mousePosition.x - labelposition.x - 3) * pixRatio);
+		int texCursorY = preview.height - (int)((Event.current.mousePosition.y - labelposition.y - 3) * pixRatio);
+		return new Vector2((float)texCursorX, (float)texCursorY);
+	}
+	
 	void TryDraw(Rect texrect){
 		if ((Event.current.type == EventType.MouseDown || Event.current.type == EventType.MouseDrag) && texrect.Contains (Event.current.mousePosition)) {
 			float pixRatio = Mathf.Max(1f, preview.width / texrect.width); // Ratio to convert mouse coordinates to texture pixel coordinates
@@ -122,7 +140,7 @@ public class TextureEditorWindow : EditorWindow
 			if (Event.current.type == EventType.MouseDown) {
 				clickpos = new Vector2(texCursorX, texCursorY);
 			} else if (Event.current.type==EventType.MouseUp){
-				//texturetk.TextureTools.DrawLine(preview, clickpos, new Vector2(texCursorX, texCursorY), Color.red);
+				texturetk.TextureTools.DrawRect(preview, clickpos, new Vector2(texCursorX, texCursorY), Color.red);
 				versions.Add(Instantiate(preview) as Texture2D);
 				Repaint ();
 			}

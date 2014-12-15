@@ -25,10 +25,15 @@ namespace texturetk
 			}
 			tex.Apply ();
 		}
-		public static void DrawLine (Texture2D tex, Vector2 pos1, Vector2 pos2, Color col){
-			for (int x=Mathf.Min (pos1.x, pos2.x);x<=Mathf.Max (pos1.x, pos2.x);x++){
-				
+		public static void DrawRect (Texture2D tex, Vector2 pos1, Vector2 pos2, Color col){
+			Vector2 start = new Vector2(Mathf.Clamp(Mathf.Min(pos1.x, pos2.x), 0, tex.width), Mathf.Clamp (Mathf.Min(pos1.y, pos2.y), 0, tex.width));
+			Vector2 end = new Vector2(Mathf.Clamp(Mathf.Max(pos1.x, pos2.x), 0, tex.width), Mathf.Clamp (Mathf.Max(pos1.y, pos2.y), 0, tex.width));
+			for (int x=(int)start.x;x<=(int)end.x;x++){
+				for (int y=(int)start.y;y<=(int)end.y;y++){
+					tex.SetPixel(x,y,col);
+				}
 			}
+			tex.Apply();
 			return;
 		}
 		/// <summary>
