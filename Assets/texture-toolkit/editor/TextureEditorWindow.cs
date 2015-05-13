@@ -11,7 +11,7 @@ public class TextureEditorWindow : EditorWindow
 	int currentTool = 0;
 	List<Texture2D> versions = new List<Texture2D> ();
 	Vector2 clickpos;
-	Rect settingsrect = new Rect (10f, 10f, 100f, 40f);
+	Rect settingsrect = new Rect (10f, 30f, 100f, 40f);
 	//Styles
 	//GUIStyle winstyle;
 	//User Prefs

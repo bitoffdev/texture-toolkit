@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-//using System.Collections;
+using System.IO;
 
 namespace texturetk
 {
@@ -39,17 +39,20 @@ namespace texturetk
 		/// Draws a line from pos1 to pos2 on the given texture
 		/// </summary>
 		public static void DrawLine (Texture2D tex, Vector2 pos1, Vector2 pos2, Color col){
-			if (pos2.x-pos1.x == 0f){//Check if vertical line
-				for (int y=(int)Mathf.Min (pos1.y, pos2.y); y<(int)Mathf.Max (pos1.y, pos2.y); y++){
-					tex.SetPixel((int)pos1.x, y, col);
+			DrawLine (tex, (int)pos1.x, (int)pos1.y, (int)pos2.x, (int)pos2.y, col);
+		}
+		public static void DrawLine (Texture2D tex, int x1, int y1, int x2, int y2, Color col){
+			if (x2-x1 == 0f){//Check if vertical line
+				for (int y=(int)Mathf.Min (y1, y2); y<(int)Mathf.Max (y1, y2); y++){
+					tex.SetPixel((int)x1, y, col);
 				}
 			} else {
-				float m = (pos2.y - pos1.y) / (pos2.x - pos1.x);//Line slope
-				float b = -m * pos1.x + pos1.y;//Y-intercept
+				float m = (y2 - y1) / (x2 - x1);//Line slope
+				float b = -m * x1 + y1;//Y-intercept
 				int blockH = (int)Mathf.Abs(m) + 1;
 				Color[] cols = new Color[blockH];
 				for (int i=0; i<cols.Length; i++) {cols[i] = col;}
-				for (float x=Mathf.Min(pos1.x, pos2.x); x<Mathf.Max(pos1.x, pos2.x); x++) {//Iterate through domain of segment
+				for (float x=Mathf.Min(x1, x2); x<Mathf.Max(x1, x2); x++) {//Iterate through domain of segment
 					tex.SetPixels((int)x, (int)(m*x+b), 1, blockH, cols);
 				}
 			}
@@ -103,6 +106,16 @@ namespace texturetk
 			}
 			tex.SetPixels (pix);
 			tex.Apply ();
+		}
+		/// <summary>
+		/// Saves a texture at the given path
+		/// </summary>
+		public static void SaveTexture(Texture2D tex, string path)
+		{
+			if (!string.IsNullOrEmpty(path)){
+				byte[] bytes = tex.EncodeToPNG();
+				File.WriteAllBytes(path, bytes);
+			}
 		}
 	}
 }
